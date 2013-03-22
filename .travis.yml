@@ -9,7 +9,7 @@ install:
   - pip install -q simplejson --use-mirrors
   - pip install -q factory_boy --use-mirrors
   - pip install -q coveralls --use-mirrors
-  - pip install django-facebook-posts --use-mirrors
+  - pip install -q django-facebook-posts --use-mirrors
   - pip install -q . --use-mirrors
 script:
   - coverage run --source=facebook_pages quicktest.py facebook_pages
