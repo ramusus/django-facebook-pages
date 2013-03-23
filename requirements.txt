@@ -1,1 +1,0 @@
-django-facebook-api>=0.1.1
