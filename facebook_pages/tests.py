@@ -23,7 +23,6 @@ class FacebookPagesTest(TestCase):
         self.assertEqual(page.category, "Product/service")
         self.assertEqual(page.username, 'FacebookDevelopers')
         self.assertEqual(page.company_overview, 'Facebook Platform enables anyone to build social apps on Facebook, mobile, and the web.')
-        self.assertEqual(page.about, 'Build and distribute amazing social apps on Facebook. https://developers.facebook.com/')
         self.assertEqual(page.link, 'http://www.facebook.com/FacebookDevelopers')
 
     def test_fetch_posts_of_page(self):
