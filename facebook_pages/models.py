@@ -89,6 +89,9 @@ class Page(FacebookGraphIDModel):
             kwargs['since'] = int(time.mktime(since.timetuple()))
 
         response = graph('%s/posts' % self.graph_id, limit=limit, offset=offset, **kwargs)
+        # TODO: think about this condition more deeply
+        if response is None:
+            return self.wall_posts.all()
         # TODO: move this checking to level up
         if 'error_code' in response and response['error_code'] == 1:
             return self.fetch_posts(all=all, limit=limit, offset=offset, until=until)
