@@ -73,54 +73,12 @@ class Page(FacebookGraphIDModel):
         from facebook_posts.models import Comment
         return Comment.objects.filter(graph_id__startswith='%s_' % self.graph_id)
 
-    def fetch_posts(self, all=False, limit=1000, offset=0, until=None, since=None):
+    def fetch_posts(self, *args, **kwargs):
         '''
         Retrieve and save all posts of page
         '''
         if 'facebook_posts' not in settings.INSTALLED_APPS:
             raise ImproperlyConfigured("Application 'facebook_posts' not in INSTALLED_APPS")
 
-        from facebook_posts.models import Post, PostOwner
-
-        kwargs = {}
-        if until:
-            kwargs['until'] = int(time.mktime(until.timetuple()))
-        if since:
-            kwargs['since'] = int(time.mktime(since.timetuple()))
-
-        response = graph('%s/posts' % self.graph_id, limit=limit, offset=offset, **kwargs)
-        # TODO: think about this condition more deeply
-        if response is None:
-            return self.wall_posts.all()
-        # TODO: move this checking to level up
-        if 'error_code' in response and response['error_code'] == 1:
-            return self.fetch_posts(all=all, limit=limit, offset=offset, until=until)
-
-        log.debug('response objects count - %s' % len(response.data))
-
-        instances = []
-        for resource in response.data:
-            try:
-                instance = Post.remote.get_or_create_from_resource(resource)
-            except Exception, e:
-                log.error("Impossible to save post with resource %s. Error is '%s'" % (resource, e))
-                continue
-
-            if instance.owners.count() == 0:
-                post_owner = PostOwner.objects.get_or_create(post=instance, owner_content_type=ContentType.objects.get_for_model(self), owner_id=self.id)[0]
-                instance.owners.add(post_owner)
-            instances += [instance]
-
-        if all:
-            response_count = len(instances)
-            log.debug('objects count - %s, limit - %s, offset - %s, until - %s' % (response_count, limit, offset, until))
-
-            if response_count != 0:
-                return self.fetch_posts(all=True, limit=limit, until=instances[len(instances)-1].created_time)
-            else:
-                self.posts_count = self.wall_posts.count()
-                self.save()
-
-            instances = self.wall_posts.all()
-
-        return instances
+        from facebook_posts.models import Post
+        return Post.remote.fetch_page_wall(self, *args, **kwargs)

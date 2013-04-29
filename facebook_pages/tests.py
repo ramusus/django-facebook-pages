@@ -25,16 +25,6 @@ class FacebookPagesTest(TestCase):
         self.assertEqual(page.company_overview, 'Facebook Platform enables anyone to build social apps on Facebook, mobile, and the web.')
         self.assertEqual(page.link, 'http://www.facebook.com/FacebookDevelopers')
 
-    def test_fetch_posts_of_page(self):
-
-        Page.remote.fetch(PAGE_ID)
-
-        page = Page.objects.all()[0]
-
-        self.assertEqual(Post.objects.count(), 0)
-        page.fetch_posts()
-        self.assertTrue(Post.objects.count() > 10)
-
     def test_fetch_page_from_resource(self):
 
         Page.remote.fetch(PAGE_ID)
