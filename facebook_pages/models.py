@@ -7,7 +7,6 @@ from facebook_api import fields
 from facebook_api.utils import graph
 from facebook_api.models import FacebookGraphIDModel, FacebookGraphManager
 import logging
-import time
 
 log = logging.getLogger('facebook_pages')
 
