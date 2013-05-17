@@ -32,7 +32,7 @@ class Page(FacebookGraphIDModel):
     category = models.CharField(max_length=100, help_text='The Page\'s category')
     phone = models.CharField(max_length=100, help_text='The phone number (not always normalized for country code) for the Page')
     picture = models.CharField(max_length=100, help_text='Link to the Page\'s profile picture') # If the "October 2012 Breaking Changes" migration setting is enabled for your app, this field will be an object with the url and is_silhouette fields; is_silhouette is true if the user has not uploaded a profile picture
-    website = models.CharField(max_length=300, help_text='Link to the external website for the page')
+    website = models.CharField(max_length=1000, help_text='Link to the external website for the page')
 
     # for managing pages
     #access_token = models.CharField(max_length=500, help_text='A Page admin access_token for this page; The current user must be an administrator of this page; only returned if specifically requested via the fields URL parameter')
