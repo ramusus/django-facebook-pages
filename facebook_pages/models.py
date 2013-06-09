@@ -17,7 +17,7 @@ class Page(FacebookGraphIDModel):
         ordering = ['name']
 
     name = models.CharField(max_length=200, help_text='The Page\'s name')
-    link = models.URLField(max_length=100, help_text='Link to the page on Facebook')
+    link = models.URLField(max_length=1000, help_text='Link to the page on Facebook')
 
     is_published = models.BooleanField(help_text='Indicates whether the page is published and visible to non-admins')
     can_post = models.BooleanField(help_text='Indicates whether the current session user can post on this Page')
