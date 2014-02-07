@@ -19,8 +19,8 @@ class Page(FacebookGraphIDModel):
     name = models.CharField(max_length=200, help_text='The Page\'s name')
     link = models.URLField(max_length=1000, help_text='Link to the page on Facebook')
 
-    is_published = models.BooleanField(help_text='Indicates whether the page is published and visible to non-admins')
-    can_post = models.BooleanField(help_text='Indicates whether the current session user can post on this Page')
+    is_published = models.BooleanField(help_text='Indicates whether the page is published and visible to non-admins', default=False)
+    can_post = models.BooleanField(help_text='Indicates whether the current session user can post on this Page', default=False)
 
     location = fields.JSONField(null=True, help_text='The Page\'s street address, latitude, and longitude (when available)')
     cover = fields.JSONField(null=True, help_text='The JSON object including cover_id (the ID of the photo), source (the URL for the cover photo), and offset_y (the percentage offset from top [0-100])')
