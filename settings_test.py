@@ -1,5 +1,6 @@
 INSTALLED_APPS = (
     'oauth_tokens',
+    'taggit',
     'facebook_api',
     'facebook_posts',
     'facebook_users',

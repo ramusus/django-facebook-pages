@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+try:
+    from django.db.transaction import atomic
+except ImportError:
+    from django.db.transaction import commit_on_success as atomic
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
@@ -72,6 +76,7 @@ class Page(FacebookGraphIDModel):
         from facebook_posts.models import Comment
         return Comment.objects.filter(graph_id__startswith='%s_' % self.graph_id)
 
+    @atomic
     def fetch_posts(self, *args, **kwargs):
         '''
         Retrieve and save all posts of page
