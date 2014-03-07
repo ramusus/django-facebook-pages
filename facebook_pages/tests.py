@@ -5,6 +5,7 @@ from facebook_posts.models import Post, get_or_create_from_small_resource
 
 PAGE_ID = '19292868552'
 PAGE_RESOURCE_SHORT = {'category': 'Product/service', 'id': PAGE_ID, 'name': 'Facebook Developers'}
+PAGE_URL = 'https://www.facebook.com/pages/METRO-Cash-and-Carry-Russia/129107667156177'
 
 class FacebookPagesTest(TestCase):
 
@@ -24,6 +25,15 @@ class FacebookPagesTest(TestCase):
         self.assertEqual(page.username, 'FacebookDevelopers')
         self.assertEqual(page.company_overview, 'Facebook Platform enables anyone to build social apps on Facebook, mobile, and the web.')
         self.assertEqual(page.link, 'http://www.facebook.com/FacebookDevelopers')
+
+    def test_get_by_url(self):
+
+        page = Page.remote.get_by_url('https://www.facebook.com/pages/METRO-Cash-and-Carry-Russia/129107667156177')
+
+        self.assertEqual(page.graph_id, '129107667156177')
+        self.assertEqual(page.name, 'METRO Cash and Carry Russia')
+        self.assertEqual(page.is_published, True)
+        self.assertEqual(page.website, 'http://www.metro-cc.ru')
 
     def test_fetch_page_from_resource(self):
 

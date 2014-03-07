@@ -11,14 +11,28 @@ from facebook_api import fields
 from facebook_api.utils import graph
 from facebook_api.models import FacebookGraphIDModel, FacebookGraphManager
 import logging
+import re
 
 log = logging.getLogger('facebook_pages')
+
+
+class FacebookPageGraphManager(FacebookGraphManager):
+
+    def get_by_slug(self, slug):
+        '''
+        Return object by slug
+        '''
+        # no slug pages - https://www.facebook.com/pages/METRO-Cash-and-Carry-Russia/129107667156177
+        if slug[:5] == 'pages':
+            m = re.findall(r'^pages/.+/(\d+)', slug)
+            slug = m[0]
+        return self.fetch(slug)
+
 
 class Page(FacebookGraphIDModel):
     class Meta:
         verbose_name = 'Facebook page'
         verbose_name_plural = 'Facebook pages'
-        ordering = ['name']
 
     name = models.CharField(max_length=200, help_text='The Page\'s name')
     link = models.URLField(max_length=1000, help_text='Link to the page on Facebook')
@@ -52,7 +66,7 @@ class Page(FacebookGraphIDModel):
     posts_count = models.IntegerField(default=0)
 
     objects = models.Manager()
-    remote = FacebookGraphManager()
+    remote = FacebookPageGraphManager()
 
     def __unicode__(self):
         return self.name
