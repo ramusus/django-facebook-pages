@@ -99,4 +99,4 @@ class Page(FacebookGraphIDModel):
             raise ImproperlyConfigured("Application 'facebook_posts' not in INSTALLED_APPS")
 
         from facebook_posts.models import Post
-        return Post.remote.fetch_page_wall(self, *args, **kwargs)
+        return Post.remote.fetch_page_wall(page=self, *args, **kwargs)
