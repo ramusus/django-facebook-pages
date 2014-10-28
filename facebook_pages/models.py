@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-try:
-    from django.db.transaction import atomic
-except ImportError:
-    from django.db.transaction import commit_on_success as atomic
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from facebook_api import fields
 from facebook_api.utils import graph
+from facebook_api.decorators import atomic
 from facebook_api.models import FacebookGraphIDModel, FacebookGraphManager
+from parser import FacebookPageFansParser, FacebookParseError
 import logging
 import re
 
 log = logging.getLogger('facebook_pages')
 
+PAGES_FANS_USER_ID = getattr(settings, 'FACEBOOK_PAGES_FANS_USER_ID')
 
 class FacebookPageGraphManager(FacebookGraphManager):
 
@@ -43,8 +42,8 @@ class Page(FacebookGraphIDModel):
     location = fields.JSONField(null=True, help_text='The Page\'s street address, latitude, and longitude (when available)')
     cover = fields.JSONField(null=True, help_text='The JSON object including cover_id (the ID of the photo), source (the URL for the cover photo), and offset_y (the percentage offset from top [0-100])')
 
-    likes = models.IntegerField(null=True, help_text='The number of users who like the Page')
-    checkins = models.IntegerField(null=True, help_text='The total number of users who have checked in to the Page')
+    likes_count = models.IntegerField(null=True, help_text='The number of users who like the Page')
+    checkins_count = models.IntegerField(null=True, help_text='The total number of users who have checked in to the Page')
     talking_about_count = models.IntegerField(null=True, help_text='The number of people that are talking about this page (last seven days)')
 
     category = models.CharField(max_length=100, help_text='The Page\'s category')
@@ -72,6 +71,10 @@ class Page(FacebookGraphIDModel):
         return self.name
 
     def parse(self, response):
+
+        for field_name in ['likes', 'checkins']:
+            response['%s_count' % field_name] = response.get(field_name)
+
         super(Page, self).parse(response)
 
     @property
@@ -100,3 +103,49 @@ class Page(FacebookGraphIDModel):
 
         from facebook_posts.models import Post
         return Post.remote.fetch_page_wall(page=self, *args, **kwargs)
+
+#    @atomic
+    def fetch_fans(self, *args, **kwargs):
+        return self.fetch_fans_ids_parser()
+
+    def fetch_fans_ids_parser(self):
+        ids = []
+        offset = 0
+        parser = FacebookPageFansParser()
+        while True:
+            try:
+                users = self.parse_fans(parser, offset)
+                assert len(users) > 0
+            except (FacebookParseError, AssertionError):
+                break
+
+            ids += [user.graph_id for user in users]
+            offset += 10
+
+#            print offset, len(ids)
+
+        return ids
+
+    def parse_fans(self, parser, offset=0):
+
+        if 'facebook_users' not in settings.INSTALLED_APPS:
+            raise ImproperlyConfigured("Application 'facebook_users' not in INSTALLED_APPS")
+        from facebook_users.models import User
+
+        parser.request(authorized=True, url='/ajax/browser/list/page_fans/?page_id=%s&start=%s&__user=%s&__a=1' % (self.graph_id, offset, PAGES_FANS_USER_ID))
+
+        users = []
+        for item in parser.content_bs.findAll('li', {'class': 'adminableItem fbProfileBrowserListItem'}):
+            initial = {'graph_id': item['id'].replace('adminableItem_', '')}
+            name = item.find('div', {'class': 'uiProfileBlockContent'}).find('a').text
+
+            # https://www.facebook.com/milkamelot?fref=pb
+            href = item.find('a')['href']
+            if 'profile.php' in href:
+                initial['username'] = href.split('?')[0].split('/')[3]
+
+            user = User(**initial)
+            user.set_name(name)
+            users += [user]
+
+        return users
