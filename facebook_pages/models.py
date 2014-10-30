@@ -7,7 +7,7 @@ from facebook_api import fields
 from facebook_api.utils import graph
 from facebook_api.decorators import atomic
 from facebook_api.models import FacebookGraphIDModel, FacebookGraphManager
-from parser import FacebookPageFansParser, FacebookParseError
+from .parser import FacebookPageFansParser, FacebookParseError
 import logging
 import re
 
