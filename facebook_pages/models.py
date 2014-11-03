@@ -13,7 +13,7 @@ import re
 
 log = logging.getLogger('facebook_pages')
 
-PAGES_FANS_USER_ID = getattr(settings, 'FACEBOOK_PAGES_FANS_USER_ID')
+PAGES_FANS_USER_ID = getattr(settings, 'FACEBOOK_PAGES_FANS_USER_ID', '')
 
 class FacebookPageGraphManager(FacebookGraphManager):
 
