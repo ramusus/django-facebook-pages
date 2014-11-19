@@ -15,6 +15,7 @@ log = logging.getLogger('facebook_pages')
 
 PAGES_FANS_USER_ID = getattr(settings, 'FACEBOOK_PAGES_FANS_USER_ID', '')
 
+
 class FacebookPageGraphManager(FacebookGraphManager):
 
     def get_by_slug(self, slug):
@@ -76,6 +77,10 @@ class Page(FacebookGraphIDModel):
             response['%s_count' % field_name] = response.get(field_name)
 
         super(Page, self).parse(response)
+
+    @property
+    def slug(self):
+        return self.username or self.graph_id
 
     @property
     def wall_posts(self):

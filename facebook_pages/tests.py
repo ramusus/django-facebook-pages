@@ -19,11 +19,10 @@ class FacebookPagesTest(TestCase):
     def test_fetch_page(self):
 
         self.assertEqual(Page.objects.count(), 0)
-        Page.remote.fetch(PAGE_ID)
-        Page.remote.fetch(PAGE_ID)
+        page = Page.remote.fetch(PAGE_ID)
+        page = Page.remote.fetch(PAGE_ID)
         self.assertEqual(Page.objects.count(), 1)
 
-        page = Page.remote.all()[0]
         self.assertEqual(page.graph_id, PAGE_ID)
         self.assertEqual(page.name, 'Facebook Developers')
         self.assertEqual(page.is_published, True)
@@ -33,6 +32,14 @@ class FacebookPagesTest(TestCase):
         self.assertEqual(page.link, 'https://www.facebook.com/FacebookDevelopers')
         self.assertTrue(len(page.company_overview) > 0)
         self.assertTrue(page.likes_count > 0)
+
+        page.username = page.website = ''
+        self.assertEqual(page.username, '')
+        self.assertEqual(page.website, '')
+        page.save()
+        page = Page.remote.fetch(PAGE_ID)
+        self.assertEqual(page.username, 'FacebookDevelopers')
+        self.assertEqual(page.website, 'http://developers.facebook.com')
 
     def test_get_by_url(self):
 
