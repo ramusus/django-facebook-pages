@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-from django.db import models
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ImproperlyConfigured
-from django.conf import settings
-from facebook_api import fields
-from facebook_api.utils import graph
-from facebook_api.decorators import atomic
-from facebook_api.models import FacebookGraphIDModel, FacebookGraphManager
-from .parser import FacebookPageFansParser, FacebookParseError
 import logging
 import re
+
+from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ImproperlyConfigured
+from django.db import models
+from facebook_api import fields
+from facebook_api.decorators import atomic
+from facebook_api.models import FacebookGraphIDModel, FacebookGraphManager
+from facebook_api.utils import graph
+
+from .parser import FacebookPageFansParser, FacebookParseError
+
 
 log = logging.getLogger('facebook_pages')
 
@@ -30,26 +33,34 @@ class FacebookPageGraphManager(FacebookGraphManager):
 
 
 class Page(FacebookGraphIDModel):
-    class Meta:
-        verbose_name = 'Facebook page'
-        verbose_name_plural = 'Facebook pages'
 
     name = models.CharField(max_length=200, help_text='The Page\'s name')
     link = models.URLField(max_length=1000, help_text='Link to the page on Facebook')
 
-    is_published = models.BooleanField(help_text='Indicates whether the page is published and visible to non-admins', default=False)
-    can_post = models.BooleanField(help_text='Indicates whether the current session user can post on this Page', default=False)
+    is_published = models.BooleanField(
+        help_text='Indicates whether the page is published and visible to non-admins', default=False)
+    can_post = models.BooleanField(
+        help_text='Indicates whether the current session user can post on this Page', default=False)
 
-    location = fields.JSONField(null=True, help_text='The Page\'s street address, latitude, and longitude (when available)')
-    cover = fields.JSONField(null=True, help_text='The JSON object including cover_id (the ID of the photo), source (the URL for the cover photo), and offset_y (the percentage offset from top [0-100])')
+    location = fields.JSONField(
+        null=True, help_text='The Page\'s street address, latitude, and longitude (when available)')
+    cover = fields.JSONField(
+        null=True, help_text='The JSON object including cover_id (the ID of the photo), source (the URL for the cover photo), and offset_y (the percentage offset from top [0-100])')
 
     likes_count = models.IntegerField(null=True, help_text='The number of users who like the Page')
-    checkins_count = models.IntegerField(null=True, help_text='The total number of users who have checked in to the Page')
-    talking_about_count = models.IntegerField(null=True, help_text='The number of people that are talking about this page (last seven days)')
+    checkins_count = models.IntegerField(
+        null=True, help_text='The total number of users who have checked in to the Page')
+    talking_about_count = models.IntegerField(
+        null=True, help_text='The number of people that are talking about this page (last seven days)')
 
     category = models.CharField(max_length=100, help_text='The Page\'s category')
-    phone = models.CharField(max_length=100, help_text='The phone number (not always normalized for country code) for the Page')
-    picture = models.CharField(max_length=100, help_text='Link to the Page\'s profile picture') # If the "October 2012 Breaking Changes" migration setting is enabled for your app, this field will be an object with the url and is_silhouette fields; is_silhouette is true if the user has not uploaded a profile picture
+    phone = models.CharField(
+        max_length=100, help_text='The phone number (not always normalized for country code) for the Page')
+    # If the "October 2012 Breaking Changes" migration setting is enabled for
+    # your app, this field will be an object with the url and is_silhouette
+    # fields; is_silhouette is true if the user has not uploaded a profile
+    # picture
+    picture = models.CharField(max_length=100, help_text='Link to the Page\'s profile picture')
     website = models.CharField(max_length=1000, help_text='Link to the external website for the page')
 
     # for managing pages
@@ -67,6 +78,10 @@ class Page(FacebookGraphIDModel):
 
     objects = models.Manager()
     remote = FacebookPageGraphManager()
+
+    class Meta:
+        verbose_name = 'Facebook page'
+        verbose_name_plural = 'Facebook pages'
 
     def __unicode__(self):
         return self.name
@@ -88,7 +103,8 @@ class Page(FacebookGraphIDModel):
             raise ImproperlyConfigured("Application 'facebook_posts' not in INSTALLED_APPS")
 
         from facebook_posts.models import Post
-        return Post.objects.filter(graph_id__startswith='%s_' % self.graph_id) #.(owners__owner_content_type=ContentType.objects.get_for_model(Page), owners__owner_id=self.id)
+        # .(owners__owner_content_type=ContentType.objects.get_for_model(Page), owners__owner_id=self.id)
+        return Post.objects.filter(graph_id__startswith='%s_' % self.graph_id)
 
     @property
     def wall_comments(self):
@@ -107,7 +123,7 @@ class Page(FacebookGraphIDModel):
             raise ImproperlyConfigured("Application 'facebook_posts' not in INSTALLED_APPS")
 
         from facebook_posts.models import Post
-        return Post.remote.fetch_page_wall(page=self, *args, **kwargs)
+        return Post.remote.fetch_page(page=self, *args, **kwargs)
 
 #    @atomic
     def fetch_fans(self, *args, **kwargs):
@@ -137,7 +153,8 @@ class Page(FacebookGraphIDModel):
             raise ImproperlyConfigured("Application 'facebook_users' not in INSTALLED_APPS")
         from facebook_users.models import User
 
-        parser.request(authorized=True, url='/ajax/browser/list/page_fans/?page_id=%s&start=%s&__user=%s&__a=1' % (self.graph_id, offset, PAGES_FANS_USER_ID))
+        parser.request(authorized=True, url='/ajax/browser/list/page_fans/?page_id=%s&start=%s&__user=%s&__a=1' %
+                       (self.graph_id, offset, PAGES_FANS_USER_ID))
 
         users = []
         for item in parser.content_bs.findAll('li', {'class': 'adminableItem fbProfileBrowserListItem'}):

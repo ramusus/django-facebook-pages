@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
-from django.test import TestCase
-from facebook_posts.models import Post, get_or_create_from_small_resource
-from models import Page, PAGES_FANS_USER_ID
-from parser import FacebookPageFansParser
-from factories import PageFactory
 from BeautifulSoup import BeautifulSoup
-from parser import FacebookParser, FacebookParseError
+from django.test import TestCase
+from facebook_api.utils import get_or_create_from_small_resource
+from facebook_posts.models import Post
 
+from .factories import PageFactory
+from .models import Page, PAGES_FANS_USER_ID
+from .parser import FacebookPageFansParser
 
 PAGE_ID = '19292868552'
 PAGE_RESOURCE_SHORT = {'category': 'Product/service', 'id': PAGE_ID, 'name': 'Facebook Developers'}
 PAGE_URL = 'https://www.facebook.com/pages/METRO-Cash-and-Carry-Russia/129107667156177'
-
 PAGE_FANS_ID = 501842786534856
+
 
 class FacebookPagesTest(TestCase):
 
@@ -30,8 +30,8 @@ class FacebookPagesTest(TestCase):
         self.assertEqual(page.category, "Product/service")
         self.assertEqual(page.username, 'FacebookDevelopers')
         self.assertEqual(page.link, 'https://www.facebook.com/FacebookDevelopers')
-        self.assertTrue(len(page.company_overview) > 0)
-        self.assertTrue(page.likes_count > 0)
+        self.assertGreater(len(page.company_overview), 0)
+        self.assertGreater(page.likes_count, 0)
 
         page.username = page.website = ''
         self.assertEqual(page.username, '')
@@ -70,12 +70,13 @@ class FacebookPageFansTest(TestCase):
 
     def test_get_parser_response(self):
 
-        parser = FacebookPageFansParser(authorized=True, url='/ajax/browser/list/page_fans/?page_id=%s&start=0&__user=%s&__a=1' % (PAGE_FANS_ID, PAGES_FANS_USER_ID))
-        self.assertTrue(isinstance(parser.content_bs, BeautifulSoup))
+        parser = FacebookPageFansParser(
+            authorized=True, url='/ajax/browser/list/page_fans/?page_id=%s&start=0&__user=%s&__a=1' % (PAGE_FANS_ID, PAGES_FANS_USER_ID))
+        self.assertIsInstance(parser.content_bs, BeautifulSoup)
 
     def test_fetch_fans_ids(self):
 
         page = PageFactory(graph_id=PAGE_FANS_ID)
 
         ids = page.fetch_fans_ids_parser()
-        self.assertTrue(len(ids) > 450)
+        self.assertGreater(len(ids), 450)
