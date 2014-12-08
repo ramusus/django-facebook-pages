@@ -3,6 +3,7 @@ import logging
 import re
 
 from django.conf import settings
+from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
@@ -13,6 +14,16 @@ from facebook_api.utils import graph
 
 from .parser import FacebookPageFansParser, FacebookParseError
 
+if 'facebook_photos' in settings.INSTALLED_APPS:
+    from facebook_photos.models import Album
+    albums = generic.GenericRelation(
+        Album, content_type_field='author_content_type', object_id_field='author_id', verbose_name=u'Albums')
+
+    def fetch_albums(self, *args, **kwargs):
+        return Album.remote.fetch_page(page=self, *args, **kwargs)
+else:
+    albums = get_improperly_configured_field('facebook_photos', True)
+    fetch_albums = get_improperly_configured_field('facebook_photos')
 
 log = logging.getLogger('facebook_pages')
 
@@ -75,6 +86,9 @@ class Page(FacebookGraphIDModel):
 
     # auto-estimated values
     posts_count = models.IntegerField(default=0)
+
+    albums = albums
+    fetch_albums = fetch_albums
 
     objects = models.Manager()
     remote = FacebookPageGraphManager()
