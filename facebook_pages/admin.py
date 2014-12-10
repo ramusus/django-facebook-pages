@@ -4,7 +4,7 @@ from facebook_api.admin import FacebookModelAdmin
 from models import Page
 
 class PageAdmin(FacebookModelAdmin):
-    list_display = ('name','username','category','likes','checkins','talking_about_count')
+    list_display = ('name','username','category','likes_count','checkins_count','talking_about_count')
     list_filter = ('is_published',)
 
 admin.site.register(Page, PageAdmin)
