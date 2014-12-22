@@ -10,7 +10,7 @@ from django.db import models
 from facebook_api import fields
 from facebook_api.decorators import atomic
 from facebook_api.models import FacebookGraphIDModel, FacebookGraphManager
-from facebook_api.utils import graph
+from facebook_api.utils import get_improperly_configured_field
 
 from .parser import FacebookPageFansParser, FacebookParseError
 
