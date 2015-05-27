@@ -16,8 +16,9 @@ from .parser import FacebookPageFansParser, FacebookParseError
 
 if 'facebook_photos' in settings.INSTALLED_APPS:
     from facebook_photos.models import Album
-    albums = generic.GenericRelation(
-        Album, content_type_field='author_content_type', object_id_field='author_id', verbose_name=u'Albums')
+    albums = get_improperly_configured_field('facebook_photos', True)
+    # albums = generic.GenericRelation(
+    #     Album, content_type_field='author_content_type', object_id_field='author_id', verbose_name=u'Albums')
 
     def fetch_albums(self, *args, **kwargs):
         return Album.remote.fetch_page(page=self, *args, **kwargs)
@@ -65,8 +66,7 @@ class Page(FacebookGraphIDModel):
         null=True, help_text='The number of people that are talking about this page (last seven days)')
 
     category = models.CharField(max_length=100, help_text='The Page\'s category')
-    phone = models.CharField(
-        max_length=100, help_text='The phone number (not always normalized for country code) for the Page')
+    phone = models.TextField(help_text='The phone number (not always normalized for country code) for the Page')
     # If the "October 2012 Breaking Changes" migration setting is enabled for
     # your app, this field will be an object with the url and is_silhouette
     # fields; is_silhouette is true if the user has not uploaded a profile
