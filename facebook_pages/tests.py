@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 from django.test import TestCase
 from facebook_api.utils import get_or_create_from_small_resource
 from facebook_posts.models import Post
