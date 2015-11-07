@@ -14,7 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 from facebook_api.parser import FacebookParser, FacebookParseError
-from django.utils import simplejson as json
+import simplejson as json
+
 
 class FacebookPageFansParser(FacebookParser):
 
