@@ -30,6 +30,18 @@ PAGE_FANS_ID = 501842786534856
 
 class FacebookPagesTest(TestCase):
 
+    def test_get_by_slug(self):
+
+        slugs = [
+            'pages/METRO-Cash-and-Carry-Russia/129107667156177',
+            'tinkoff.ins/',
+        ]
+        for slug in slugs:
+            page = Page.remote.get_by_slug(slug)
+            self.assertIsInstance(page, Page)
+
+        self.assertEqual(Page.objects.count(), 0)
+
     def test_fetch_page(self):
 
         self.assertEqual(Page.objects.count(), 0)

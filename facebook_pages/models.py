@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 Copyright 2011-2015 ramusus
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-'''
+"""
 import logging
 import re
 
@@ -48,14 +48,14 @@ PAGES_FANS_USER_ID = getattr(settings, 'FACEBOOK_PAGES_FANS_USER_ID', '')
 class FacebookPageGraphManager(FacebookGraphManager):
 
     def get_by_slug(self, slug):
-        '''
+        """
         Return object by slug
-        '''
+        """
         # no slug pages - https://www.facebook.com/pages/METRO-Cash-and-Carry-Russia/129107667156177
         if slug[:5] == 'pages':
             m = re.findall(r'^pages/.+/(\d+)', slug)
             slug = m[0]
-        return self.fetch(slug)
+        return self.get(slug)
 
 
 class Page(FacebookGraphIDModel):
@@ -144,9 +144,9 @@ class Page(FacebookGraphIDModel):
 
     @atomic
     def fetch_posts(self, *args, **kwargs):
-        '''
+        """
         Retrieve and save all posts of page
-        '''
+        """
         if 'facebook_posts' not in settings.INSTALLED_APPS:
             raise ImproperlyConfigured("Application 'facebook_posts' not in INSTALLED_APPS")
 
