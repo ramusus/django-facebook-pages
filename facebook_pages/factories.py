@@ -15,7 +15,9 @@ limitations under the License.
 from models import Page
 import factory
 
-class PageFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = Page
 
+class PageFactory(factory.DjangoModelFactory):
     graph_id = factory.Sequence(lambda n: n)
+
+    class Meta:
+        model = Page

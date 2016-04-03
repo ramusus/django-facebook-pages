@@ -26,7 +26,6 @@ from facebook_api.decorators import atomic
 from facebook_api.models import FacebookGraphIDModel, FacebookGraphManager
 from facebook_api.utils import get_improperly_configured_field
 
-from .parser import FacebookPageFansParser, FacebookParseError
 
 if 'facebook_photos' in settings.INSTALLED_APPS:
     from facebook_photos.models import Album
@@ -158,6 +157,7 @@ class Page(FacebookGraphIDModel):
         return self.fetch_fans_ids_parser()
 
     def fetch_fans_ids_parser(self):
+        from .parser import FacebookPageFansParser, FacebookParseError
         ids = []
         offset = 0
         parser = FacebookPageFansParser()

@@ -14,9 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 from bs4 import BeautifulSoup
-from django.test import TestCase
 from facebook_api.utils import get_or_create_from_small_resource
-from facebook_posts.models import Post
+from facebook_api.tests import FacebookApiTestCase
 
 from .factories import PageFactory
 from .models import Page, PAGES_FANS_USER_ID
@@ -28,7 +27,7 @@ PAGE_URL = 'https://www.facebook.com/pages/METRO-Cash-and-Carry-Russia/129107667
 PAGE_FANS_ID = 501842786534856
 
 
-class FacebookPagesTest(TestCase):
+class FacebookPagesTest(FacebookApiTestCase):
 
     def test_get_by_slug(self):
 
@@ -92,7 +91,7 @@ class FacebookPagesTest(TestCase):
         self.assertEqual(page2.category, PAGE_RESOURCE_SHORT['category'])
 
 
-class FacebookPageFansTest(TestCase):
+class FacebookPageFansTest(FacebookApiTestCase):
 
     def test_get_parser_response(self):
 
