@@ -17,8 +17,6 @@ import logging
 import re
 
 from django.conf import settings
-from django.contrib.contenttypes import generic
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from facebook_api import fields
